@@ -1,6 +1,6 @@
 {
     "name": "business",
-    "version": "0.1.0",
+    "version": "3.0.1",
     "private": true,
     "homepage": ".",
     "dependencies": {
@@ -19,9 +19,7 @@
         "@testing-library/react": "^11.2.6",
         "@testing-library/user-event": "^12.8.3",
         "apexcharts": "^3.26.1",
-        "axios": "^0.26.1",
         "clsx": "^1.1.1",
-        "env-cmd": "^10.1.0",
         "formik": "^2.2.6",
         "framer-motion": "^4.1.13",
         "history": "^5.0.0",
@@ -47,8 +45,7 @@
     },
     "eslintConfig": {
         "extends": [
-            "react-app",
-            "react-app/jest"
+            "react-app"
         ]
     },
     "babel": {
