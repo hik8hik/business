@@ -8,7 +8,7 @@ import { Divider, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 import AuthWrapper1 from '../AuthWrapper1';
 import AuthCardWrapper from '../AuthCardWrapper';
 import Logo from 'ui-component/Logo';
-import AuthRegister from '../auth-forms/AuthRegister';
+import AuthRegister from '../auth-forms/Authforgotpassword';
 import AuthFooter from 'ui-component/cards/AuthFooter';
 
 // assets
@@ -46,14 +46,14 @@ const Register = () => {
                                                         gutterBottom
                                                         variant={matchDownSM ? 'h3' : 'h2'}
                                                     >
-                                                        New here? Welcome...
+                                                        Forgot Password
                                                     </Typography>
                                                     <Typography
                                                         variant="caption"
                                                         fontSize="16px"
                                                         textAlign={matchDownSM ? 'center' : 'inherit'}
                                                     >
-                                                        Enter your credentials to continue
+                                                        Enter your registered email to continue.
                                                     </Typography>
                                                 </Stack>
                                             </Grid>
@@ -68,7 +68,10 @@ const Register = () => {
                                     <Grid item xs={12}>
                                         <Grid item container direction="column" alignItems="center" xs={12}>
                                             <Typography component={Link} to="/login" variant="subtitle1" sx={{ textDecoration: 'none' }}>
-                                                Already have an account?
+                                                Login
+                                            </Typography>
+                                            <Typography component={Link} to="/register" variant="subtitle1" sx={{ textDecoration: 'none' }}>
+                                                Sign Up
                                             </Typography>
                                         </Grid>
                                     </Grid>

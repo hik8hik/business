@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import axios from 'axios';
-
-import { Link, useNavigate } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -20,7 +19,7 @@ import {
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    Stack,
+    TextField,
     Typography,
     useMediaQuery
 } from '@mui/material';
@@ -31,22 +30,30 @@ import { Formik } from 'formik';
 
 // project imports
 import useScriptRef from 'hooks/useScriptRef';
+import Google from 'assets/images/icons/social-google.svg';
 import AnimateButton from 'ui-component/extended/AnimateButton';
+import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
 // assets
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-// ============================|| FIREBASE - LOGIN ||============================ //
+// ===========================|| FIREBASE - REGISTER ||=========================== //
 
-const Login = ({ ...others }) => {
+const AuthReset = ({ ...others }) => {
     const theme = useTheme();
     const scriptedRef = useScriptRef();
     const matchDownSM = useMediaQuery(theme.breakpoints.down('md'));
     const customization = useSelector((state) => state.customization);
-    const [checked, setChecked] = useState(true);
-
     const [showPassword, setShowPassword] = useState(false);
+
+    const [strength, setStrength] = useState(0);
+    const [level, setLevel] = useState();
+
+    const googleHandler = async () => {
+        console.error('Register');
+    };
+
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -55,20 +62,22 @@ const Login = ({ ...others }) => {
         event.preventDefault();
     };
 
+    const changePassword = (value) => {
+        const temp = strengthIndicator(value);
+        setStrength(temp);
+        setLevel(strengthColor(temp));
+    };
+
     const navigate = useNavigate();
+
+    const { resetToken } = useParams();
 
     return (
         <>
             <Grid container direction="column" justifyContent="center" spacing={2}>
                 <Grid item xs={12}>
-                    <Box
-                        sx={{
-                            alignItems: 'center',
-                            display: 'flex'
-                        }}
-                    >
+                    <Box sx={{ alignItems: 'center', display: 'flex' }}>
                         <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
-
                         <Button
                             variant="outlined"
                             sx={{
@@ -84,47 +93,39 @@ const Login = ({ ...others }) => {
                             disableRipple
                             disabled
                         >
-                            LOGIN
+                            CHANGE PASSWORD
                         </Button>
-
                         <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
                     </Box>
                 </Grid>
                 <Grid item xs={12} container alignItems="center" justifyContent="center">
                     <Box sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1">Sign in with Email address</Typography>
+                        <Typography variant="subtitle1">Change to memorable password</Typography>
                     </Box>
                 </Grid>
             </Grid>
 
             <Formik
                 initialValues={{
-                    email: '',
-                    password: '',
-                    submit: true
+                    password: ''
                 }}
                 validationSchema={Yup.object().shape({
-                    email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                     password: Yup.string().max(255).required('Password is required')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     const config = {
                         header: { 'Content-Type': 'application/json' }
                     };
-                    const password = values.password;
-                    const email = values.email;
-                    try {
-                        const { data } = await axios.post('/api/auth/login', { email, password }, config);
 
-                        localStorage.setItem('authToken', data.token);
-                        localStorage.setItem('0513010912', data.email);
+                    const password = values.password;
+                    try {
+                        await axios.put(`/api/auth/resetpassword/${resetToken}`, { password }, config);
 
                         if (scriptedRef.current) {
                             setStatus({ success: true });
                             setSubmitting(true);
                         }
-
-                        navigate('/');
+                        navigate('/login');
                     } catch (err) {
                         console.error(err);
                         if (scriptedRef.current) {
@@ -137,38 +138,21 @@ const Login = ({ ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
-                        <FormControl fullWidth error={Boolean(touched.email && errors.email)} sx={{ ...theme.typography.customInput }}>
-                            <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
-                            <OutlinedInput
-                                id="outlined-adornment-email-login"
-                                type="email"
-                                value={values.email}
-                                name="email"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                label="Email Address / Username"
-                                inputProps={{}}
-                            />
-                            {touched.email && errors.email && (
-                                <FormHelperText error id="standard-weight-helper-text-email-login">
-                                    {errors.email}
-                                </FormHelperText>
-                            )}
-                        </FormControl>
-
                         <FormControl
                             fullWidth
                             error={Boolean(touched.password && errors.password)}
                             sx={{ ...theme.typography.customInput }}
                         >
-                            <InputLabel htmlFor="outlined-adornment-password-login">Password</InputLabel>
+                            <InputLabel htmlFor="outlined-adornment-password-register">New Password</InputLabel>
                             <OutlinedInput
-                                id="outlined-adornment-password-login"
+                                id="outlined-adornment-password-register"
                                 type={showPassword ? 'text' : 'password'}
                                 value={values.password}
                                 name="password"
+                                label="New Password"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
+                                onInput={(e) => changePassword(e.target.value)}
                                 endAdornment={
                                     <InputAdornment position="end">
                                         <IconButton
@@ -182,37 +166,35 @@ const Login = ({ ...others }) => {
                                         </IconButton>
                                     </InputAdornment>
                                 }
-                                label="Password"
                                 inputProps={{}}
                             />
                             {touched.password && errors.password && (
-                                <FormHelperText error id="standard-weight-helper-text-password-login">
+                                <FormHelperText error id="standard-weight-helper-text-password-register">
                                     {errors.password}
                                 </FormHelperText>
                             )}
                         </FormControl>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={checked}
-                                        onChange={(event) => setChecked(event.target.checked)}
-                                        name="checked"
-                                        color="primary"
-                                    />
-                                }
-                                label="Remember me"
-                            />
-                            <Typography
-                                component={Link}
-                                to="/forgotpassword"
-                                variant="subtitle1"
-                                color="secondary"
-                                sx={{ textDecoration: 'none', cursor: 'pointer' }}
-                            >
-                                Forgot Password?
-                            </Typography>
-                        </Stack>
+
+                        {strength !== 0 && (
+                            <FormControl fullWidth>
+                                <Box sx={{ mb: 2 }}>
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item>
+                                            <Box
+                                                style={{ backgroundColor: level?.color }}
+                                                sx={{ width: 85, height: 8, borderRadius: '7px' }}
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography variant="subtitle1" fontSize="0.75rem">
+                                                {level?.label}
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            </FormControl>
+                        )}
+
                         {errors.submit && (
                             <Box sx={{ mt: 3 }}>
                                 <FormHelperText error>{errors.submit}</FormHelperText>
@@ -230,7 +212,7 @@ const Login = ({ ...others }) => {
                                     variant="contained"
                                     color="secondary"
                                 >
-                                    Sign in
+                                    Change
                                 </Button>
                             </AnimateButton>
                         </Box>
@@ -241,4 +223,4 @@ const Login = ({ ...others }) => {
     );
 };
 
-export default Login;
+export default AuthReset;

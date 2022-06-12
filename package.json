@@ -3,6 +3,9 @@
     "version": "3.0.1",
     "private": true,
     "homepage": ".",
+    "//local": "http://127.0.0.1:5000",
+    "//online": "https://dry-stream-10813.herokuapp.com",
+    "proxy": "http://127.0.0.1:5000",
     "dependencies": {
         "@emotion/cache": "^11.4.0",
         "@emotion/react": "^11.4.0",
@@ -19,6 +22,7 @@
         "@testing-library/react": "^11.2.6",
         "@testing-library/user-event": "^12.8.3",
         "apexcharts": "^3.26.1",
+        "axios": "^0.27.2",
         "clsx": "^1.1.1",
         "formik": "^2.2.6",
         "framer-motion": "^4.1.13",
