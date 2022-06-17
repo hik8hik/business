@@ -55,7 +55,7 @@ import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDown
 
 // ==============================|| DASHBOARD DEFAULT - POPULAR CARD ||============================== //
 
-const PopularCard = ({ isLoading }, { ...others }) => {
+const AddBusinesses = ({ isLoading, callRefetch }, { ...others }) => {
     const theme = useTheme();
     const scriptedRef = useScriptRef();
 
@@ -79,6 +79,10 @@ const PopularCard = ({ isLoading }, { ...others }) => {
         setAnchorEl(null);
     };
 
+    const callit = () => {
+        callRefetch();
+    };
+
     return (
         <>
             {isLoading ? (
@@ -91,6 +95,7 @@ const PopularCard = ({ isLoading }, { ...others }) => {
                                 <Grid container alignContent="center" justifyContent="space-between">
                                     <Grid item>
                                         <Typography variant="h4">Add Business</Typography>
+                                        <Typography onClick={callRefetch}>Clickfromaddbusinesses</Typography>
                                     </Grid>
                                     <Grid item>
                                         <MoreHorizOutlinedIcon
@@ -166,6 +171,7 @@ const PopularCard = ({ isLoading }, { ...others }) => {
                                             if (scriptedRef.current) {
                                                 setStatus({ success: true });
                                                 setSubmitting(true);
+                                                callRefetch();
                                             }
                                         } catch (err) {
                                             console.error(err);
@@ -331,8 +337,8 @@ const PopularCard = ({ isLoading }, { ...others }) => {
     );
 };
 
-PopularCard.propTypes = {
+AddBusinesses.propTypes = {
     isLoading: PropTypes.bool
 };
 
-export default PopularCard;
+export default AddBusinesses;

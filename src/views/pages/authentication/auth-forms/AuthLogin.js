@@ -117,7 +117,7 @@ const Login = ({ ...others }) => {
                         const { data } = await axios.post('/api/auth/login', { email, password }, config);
 
                         localStorage.setItem('authToken', data.token);
-                        localStorage.setItem('0513010912', data.email);
+                        localStorage.setItem('0513010912', data.businesses);
 
                         if (scriptedRef.current) {
                             setStatus({ success: true });

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+/* eslint no-underscore-dangle: 0 */
+import { useEffect, useState, forwardRef, useRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 
 import axios from 'axios';
@@ -77,7 +78,7 @@ ShadowBox.propTypes = {
 };
 
 // ==============================|| BUSINESS CARD ||============================== //
-const BusinessCard = ({ isLoading }, { names }) => {
+const BusinessCard = ({ isLoading, refetchBusinesses }) => {
     const theme = useTheme();
 
     const [businesses, setBusinesses] = useState([]);
@@ -101,6 +102,25 @@ const BusinessCard = ({ isLoading }, { names }) => {
         };
 
         getData();
+    }, []);
+
+    // Refetches fetched user businesses
+    const reFetch = async () => {
+        const getData = async () => {
+            try {
+                await axios.get(`/api/private/getuserbusinesses`, config).then((response) => {
+                    setBusinesses(response.data.data);
+                });
+            } catch (error) {
+                console.error(error.message);
+            }
+        };
+
+        getData();
+    };
+
+    useEffect(() => {
+        refetchBusinesses.current = reFetch;
     }, []);
 
     return (
@@ -149,7 +169,7 @@ const BusinessCard = ({ isLoading }, { names }) => {
                                             >
                                                 CLick on any business to launch it.
                                                 {businesses.map((option) => (
-                                                    <Button key={option.name} variant="text">
+                                                    <Button key={option._id} variant="text">
                                                         {option.name}
                                                     </Button>
                                                 ))}
@@ -165,7 +185,7 @@ const BusinessCard = ({ isLoading }, { names }) => {
                                                 You don&apos;t have any business to to show here. You can create a business from here the
                                                 button below.
                                                 {businesses.map((option) => (
-                                                    <p key={option.name} value={option.name}>
+                                                    <p key={option._id} value={option.name}>
                                                         {`Category: ${option.category} Sub-Category: ${option.subcategory}`}
                                                     </p>
                                                 ))}
@@ -188,6 +208,8 @@ const BusinessCard = ({ isLoading }, { names }) => {
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
+    const refetchBusinesses = useRef(null);
+
     const [isLoading, setLoading] = useState(true);
     const [aval, setAval] = useState(false);
     const [waitmsg, setWaitmsg] = useState('Please Wait');
@@ -201,6 +223,10 @@ const Dashboard = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('authToken')}`
         }
+    };
+
+    const callRefetch = () => {
+        refetchBusinesses.current();
     };
 
     useEffect(() => {
@@ -296,13 +322,12 @@ const Dashboard = () => {
             <Grid item xs={12}>
                 <Grid container spacing={gridSpacing}>
                     <Grid item sm={12} xs={12} md={12} lg={12}>
-                        <NoBusinessLightCard isLoading={isLoading} />
-                    </Grid>
-                    <Grid item sm={12} xs={12} md={12} lg={12}>
-                        <BusinessCard isLoading={isLoading} names={names} />
+                        <Typography onClick={callRefetch}>Click</Typography>
+                        <Typography onClick={() => refetchBusinesses.current()}>Click2</Typography>
+                        <BusinessCard refetchBusinesses={refetchBusinesses} isLoading={isLoading} names={names} />
                     </Grid>
                     <Grid item xs={12} md={12} lg={12}>
-                        <AddBusiness isLoading={isLoading} />
+                        <AddBusiness callRefetch={callRefetch} isLoading={isLoading} />
                     </Grid>
                 </Grid>
             </Grid>
